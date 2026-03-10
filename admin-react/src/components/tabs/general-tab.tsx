@@ -1,0 +1,160 @@
+import { ActionButton } from "@repo/react-ui/components/ui/action-button";
+import { Badge } from "@repo/react-ui/components/ui/badge";
+import { Card, CardContent } from "@repo/react-ui/components/ui/card";
+import { Descriptions, DescriptionsItem } from "@repo/react-ui/components/ui/descriptions";
+import { Separator } from "@repo/react-ui/components/ui/separator";
+import { Spinner } from "@repo/react-ui/components/ui/spinner";
+import { useQueryClient } from "@tanstack/react-query";
+import { CheckCircle, Unplug } from "lucide-react";
+import { useEffect } from "react";
+
+import { toastMessage } from "../../hooks/toast-message";
+import { useOrganization } from "../../hooks/use-organization";
+import { useConnectStore, useSettings } from "../../hooks/use-settings";
+import { useStore } from "../../hooks/use-store";
+import { api } from "../../lib/api";
+import OnboardingFlow from "../onboarding/onboarding-flow";
+
+export default function GeneralTab() {
+  const { data: settings, isLoading } = useSettings();
+  const { data: store, isLoading: storeLoading, refetch: refetchStore } = useStore();
+  const { data: organization, isLoading: orgLoading, refetch: refetchOrg } = useOrganization();
+  const connectStore = useConnectStore();
+  const queryClient = useQueryClient();
+  const toast = toastMessage();
+
+  const isConnected = settings?.connection_status === "connected";
+
+  useEffect(() => {
+    if (isConnected) {
+      if (!store)
+        refetchStore();
+      if (!organization)
+        refetchOrg();
+    }
+  }, [isConnected, store, organization, refetchStore, refetchOrg]);
+
+  const handleOnboardingComplete = async (apiKey: string, storeId: string) => {
+    try {
+      await connectStore.mutateAsync({
+        action: "connect",
+        api_key: apiKey,
+        store_id: storeId,
+      });
+      toast.success("Store connected successfully!");
+    }
+    catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to connect store",
+      );
+    }
+  };
+
+  async function disconnectStore() {
+    try {
+      await api.request("connect", {
+        method: "POST",
+        body: JSON.stringify({ action: "disconnect" }),
+      });
+      await queryClient.invalidateQueries({ queryKey: ["settings"] });
+      return { error: false };
+    }
+    catch (error) {
+      return {
+        error: true,
+        message: error instanceof Error ? error.message : "Failed to disconnect",
+      };
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-8">
+          <Spinner className="size-8" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!isConnected) {
+    return <OnboardingFlow onComplete={handleOnboardingComplete} />;
+  }
+
+  const dataLoading = storeLoading || orgLoading;
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardContent className="space-y-6">
+          <h3 className="text-xl font-semibold">General</h3>
+          {dataLoading
+            ? (
+                <div className="flex items-center justify-center py-8">
+                  <Spinner className="size-8" />
+                </div>
+              )
+            : (
+                <Descriptions bordered>
+                  <DescriptionsItem label="Status">
+                    <Badge className="bg-green-600 text-white capitalize">
+                      <CheckCircle className="size-3 mr-1" />
+                      {settings?.connection_status ?? "connected"}
+                    </Badge>
+                  </DescriptionsItem>
+                  <DescriptionsItem label="UCP Hub Dashboard">
+                    <a
+                      href="https://app.ucphub.ai/login"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline"
+                    >
+                      app.ucphub.ai/login
+                    </a>
+                  </DescriptionsItem>
+                  {organization && (
+                    <>
+                      <DescriptionsItem label="Organization">
+                        {organization.name || <span className="text-muted-foreground">Not set</span>}
+                      </DescriptionsItem>
+                      <DescriptionsItem label="Plan">
+                        <Badge variant="secondary">{organization.planId || "free"}</Badge>
+                      </DescriptionsItem>
+                    </>
+                  )}
+                  {store && (
+                    <DescriptionsItem label="Store">
+                      {store.name || <span className="text-muted-foreground">Not set</span>}
+                    </DescriptionsItem>
+                  )}
+                </Descriptions>
+              )}
+        </CardContent>
+      </Card>
+
+      <Separator />
+
+      <Card className="border-destructive/50">
+        <CardContent className="space-y-4">
+          <h3 className="text-lg font-semibold text-destructive">Danger Zone</h3>
+          <p className="text-sm text-muted-foreground">
+            Disconnecting your store will prevent AI agents from interacting with it. You can reconnect at any time.
+          </p>
+          <ActionButton
+            variant="outline"
+            className="text-destructive border-destructive hover:text-destructive hover:bg-destructive/10"
+            requireAreYouSure
+            areYouSureDescription="This will disconnect your store from the UCP backend. AI agents will no longer be able to interact with your store. You can reconnect at any time."
+            areYouSureConfirmVariant="outline"
+            areYouSureConfirmClassName="text-destructive border-destructive hover:text-destructive hover:bg-destructive/10"
+            successMessage="Store disconnected successfully"
+            action={disconnectStore}
+          >
+            <Unplug className="size-4" />
+            Disconnect
+          </ActionButton>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

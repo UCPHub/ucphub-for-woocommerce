@@ -1,0 +1,44 @@
+@import "@repo/react-ui/globals.css";
+@import "tailwindcss";
+
+@source "../**/*.{ts,tsx}";
+
+#ucphub-settings-root {
+    font-family:
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#ucphub-settings-root *,
+#ucphub-settings-root *::before,
+#ucphub-settings-root *::after {
+    box-sizing: border-box;
+}
+
+#ucphub-settings-root dd {
+    margin-bottom: 0;
+}
+
+#ucphub-settings-root ol {
+    margin-left: 1rem;
+}
+
+[data-slot="alert-dialog-header"] h2 {
+    margin: 0;
+}
+
+#ucphub-settings-root a[data-slot="button"][data-variant="outline"] {
+    font-weight: 400;
+    color: var(--button-text);
+    text-decoration: none;
+}

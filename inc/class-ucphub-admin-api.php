@@ -224,7 +224,7 @@ class UCPHubAdminAPI
             UCPHubConfig::update('store_id', $store_id);
             UCPHubConfig::update('connection_status', 'connected');
 
-            delete_transient('ucphub_discovery_data');
+    
 
             return new \WP_REST_Response(
                 [
@@ -816,10 +816,8 @@ class UCPHubAdminAPI
             );
         }
 
-        $store_data = json_decode($response['body'], true);
+        $store_data = json_decode($response['body'], true);        
 
-        // Clear discovery cache when store is updated
-        delete_transient('ucphub_discovery_data');
 
         return new \WP_REST_Response($store_data, 200);
     }
@@ -1033,10 +1031,7 @@ class UCPHubAdminAPI
                 sprintf(__('Failed to update store integration: HTTP %1$d - %2$s', 'ucphub-for-woocommerce'), $response['code'], $error_message),
                 ['status' => $response['code']]
             );
-        }
-
-        // Clear discovery cache when integration settings change
-        delete_transient('ucphub_discovery_data');
+        }    
 
         // Fetch and return updated store info
         $updated_info = $this->get_store_info();

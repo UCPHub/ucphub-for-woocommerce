@@ -19,7 +19,7 @@ UCPHub for WooCommerce enables your store to participate in the Universal Commer
 * Serve a UCP discovery profile on your store's `/.well-known/ucp` endpoint
 * Configure which UCP capabilities your store supports (checkout, orders, fulfillment, discounts)
 * Manage payment handler integrations for AI-driven purchases
-* Connect to the UCPHub backend for centralized store management
+* Connect to UCPHub for centralized store management
 
 = Requirements =
 
@@ -45,15 +45,15 @@ Yes. You need to create an account at [app.ucphub.ai](https://app.ucphub.ai) and
 
 == External services ==
 
-This plugin connects to the UCPHub backend API to enable UCP protocol functionality for your WooCommerce store.
+This plugin connects to the UCPHub API to enable UCP protocol functionality for your WooCommerce store.
 
 = UCPHub API (api.ucphub.ai) =
 
-This plugin sends requests to the UCPHub backend at `https://api.ucphub.ai` in the following situations:
+This plugin sends requests to UCPHub at `https://api.ucphub.ai` in the following situations:
 
-* **On plugin activation:** The backend URL is stored as a setting.
-* **When serving the UCP discovery profile:** The plugin fetches your store's UCP profile from the backend and caches it for 1 hour. This happens when any visitor or AI agent accesses `/.well-known/ucp` on your store.
-* **When managing store settings:** API key, store ID, and store configuration are sent to the backend when you connect, disconnect, or update your store settings in the WordPress admin.
+* **On plugin activation:** The UCPHub API URL is stored as a setting.
+* **When serving the UCP discovery profile:** The plugin fetches your store's UCP profile from UCPHub. This happens when any visitor or AI agent accesses `/.well-known/ucp` on your store.
+* **When managing store settings:** API key, store ID, and store configuration are sent to UCPHub when you connect, disconnect, or update your store settings in the WordPress admin.
 * **When completing onboarding setup:** Store URL, WooCommerce credentials, and selected capabilities are sent during the initial setup process.
 
 Data sent includes: API key, store ID, store URL, WooCommerce REST API credentials (consumer key/secret), and store configuration settings.

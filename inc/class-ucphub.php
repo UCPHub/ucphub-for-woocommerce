@@ -58,7 +58,6 @@ class UCPHub
     public static function uninstall()
     {
         UCPHubConfig::delete_all();
-        delete_transient('ucphub_discovery_data');
     }
 
     public static function debug($message)

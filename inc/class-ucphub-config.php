@@ -98,7 +98,5 @@ class UCPHubConfig
         foreach ($keys as $key) {
             self::delete($key);
         }
-
-        delete_transient('ucphub_discovery_data');
     }
 }

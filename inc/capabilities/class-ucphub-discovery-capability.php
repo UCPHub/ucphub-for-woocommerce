@@ -39,18 +39,7 @@ class UCPHubDiscoveryCapability
             );
         }
 
-        $cached = get_transient('ucphub_discovery_data');
-
-        if ($cached !== false && !\UCPHub\UCPHubErrorHelper::is_error($cached)) {
-            return $cached;
-        }
-
         $ucp_api = new \UCPHub\UCPHubUCPAPI();
-        $discovery_data = $ucp_api->get_discovery();
-
-        $cache_time = \UCPHub\UCPHubErrorHelper::is_error($discovery_data) ? 300 : 3600;
-        set_transient('ucphub_discovery_data', $discovery_data, $cache_time);
-
-        return $discovery_data;
+        return $ucp_api->get_discovery();
     }
 }

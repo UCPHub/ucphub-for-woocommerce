@@ -137,7 +137,23 @@ class UCPHubAdmin
             'ucphub-for-woocommerce'
         );
         echo '</p></div>';
-        echo '<script>jQuery(document).on("click","#ucphub-debug-notice .notice-dismiss",function(){jQuery.post(ajaxurl,{action:"ucphub_dismiss_debug_notice",_wpnonce:"' . esc_js(wp_create_nonce('ucphub_dismiss_debug_notice')) . '"})});</script>';
+
+        $plugin_root_path = dirname(dirname(__FILE__));
+        $js_path = $plugin_root_path . '/assets/js/dismiss-notice.js';
+        $plugin_root_url = plugin_dir_url($plugin_root_path . '/ucphub-for-woocommerce.php');
+
+        wp_enqueue_script(
+            'ucphub-dismiss-notice',
+            $plugin_root_url . 'assets/js/dismiss-notice.js',
+            ['jquery'],
+            file_exists($js_path) ? filemtime($js_path) : UCPHUB_VERSION,
+            true
+        );
+        wp_add_inline_script(
+            'ucphub-dismiss-notice',
+            'var ucphubDismissNotice = ' . wp_json_encode(['nonce' => wp_create_nonce('ucphub_dismiss_debug_notice')]) . ';',
+            'before'
+        );
     }
 
     public function dismiss_debug_display_notice()

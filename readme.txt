@@ -4,7 +4,7 @@ Tags: woocommerce, ucp, ai, commerce, automation
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -70,6 +70,9 @@ The full source code for this plugin, including the React admin dashboard and bu
 [https://github.com/UCPHub/ucphub-for-woocommerce](https://github.com/UCPHub/ucphub-for-woocommerce)
 
 == Changelog ==
+
+= 1.0.1 =
+* Fixed inline script for notice dismissal to use wp_enqueue_script and wp_add_inline_script per WordPress guidelines.
 
 = 1.0.0 =
 * Initial release.

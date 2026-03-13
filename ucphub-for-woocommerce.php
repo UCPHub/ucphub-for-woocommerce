@@ -3,7 +3,7 @@
 /*
 Plugin Name: UCPHub for WooCommerce
 Description: UCPHub for WooCommerce is a plugin that allows you to utilize UCP to allow for customers to purchase your products using automated AI agents.
-Version: 1.0.0
+Version: 1.0.1
 Author: UCPHub
 Author URI: https://ucphub.ai
 Text Domain: ucphub-for-woocommerce
@@ -33,7 +33,7 @@ if (!ucphub_check_woocommerce_installed()) {
     return;
 }
 
-define('UCPHUB_VERSION', '1.0.0');
+define('UCPHUB_VERSION', '1.0.1');
 define('UCPHUB_FILE', __FILE__);
 define('UCPHUB_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('UCPHUB_PLUGIN_URL', plugin_dir_url(__FILE__));

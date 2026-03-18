@@ -32,6 +32,7 @@ class UCPHub
         require_once UCPHUB_PLUGIN_DIR . 'inc/class-ucphub-admin-api.php';
         require_once UCPHUB_PLUGIN_DIR . 'inc/class-ucphub-admin.php';
         require_once UCPHUB_PLUGIN_DIR . 'inc/capabilities/class-ucphub-discovery-capability.php';
+        require_once UCPHUB_PLUGIN_DIR . 'inc/class-ucphub-compatibility.php';
     }
 
     private function init_hooks()
@@ -39,6 +40,7 @@ class UCPHub
         new UCPHubConfig();
         new UCPHubAdmin();
         new UCPHubAdminAPI();
+        UCPHubCompatibility::init();
 
         add_action('template_redirect', [$this, 'handle_discovery_endpoint']);
 
@@ -64,7 +66,7 @@ class UCPHub
     {
         if (defined('WP_DEBUG') && defined('UCPHUB_DEBUG_MODE') && WP_DEBUG && UCPHUB_DEBUG_MODE) {
             // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log, WordPress.PHP.DevelopmentFunctions.error_log_print_r
-            error_log('UCPHub: ' . print_r($message, true));
+            error_log('UCPhub: ' . print_r($message, true));
         }
     }
 }

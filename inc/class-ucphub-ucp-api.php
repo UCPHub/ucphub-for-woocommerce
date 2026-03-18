@@ -16,7 +16,7 @@ class UCPHubUCPAPI
         if (empty($api_key) || empty($store_id)) {
             return UCPHubErrorHelper::create_error(
                 'not_configured',
-                __('UCPHub is not connected. Please configure the plugin in WordPress admin.', 'ucphub-for-woocommerce')
+                __('UCPhub is not connected. Please configure the plugin in WordPress admin.', 'ucphub-for-woocommerce')
             );
         }
 

@@ -22,16 +22,16 @@ class UCPHubAdmin
         if (class_exists('WooCommerce')) {
             add_submenu_page(
                 'woocommerce',
-                __('UCPHub Settings', 'ucphub-for-woocommerce'),
-                __('UCPHub', 'ucphub-for-woocommerce'),
+                __('UCPhub Settings', 'ucphub-for-woocommerce'),
+                __('UCPhub', 'ucphub-for-woocommerce'),
                 'manage_woocommerce',
                 'woocommerce-ucphub',
                 [$this, 'render_admin_page']
             );
         } else {
             add_options_page(
-                __('UCPHub Settings', 'ucphub-for-woocommerce'),
-                __('UCPHub', 'ucphub-for-woocommerce'),
+                __('UCPhub Settings', 'ucphub-for-woocommerce'),
+                __('UCPhub', 'ucphub-for-woocommerce'),
                 'manage_options',
                 'woocommerce-ucphub',
                 [$this, 'render_admin_page']

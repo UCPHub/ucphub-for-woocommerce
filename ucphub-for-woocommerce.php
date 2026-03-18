@@ -1,14 +1,16 @@
 <?php
 
 /*
-Plugin Name: UCPHub for WooCommerce
-Description: UCPHub for WooCommerce is a plugin that allows you to utilize UCP to allow for customers to purchase your products using automated AI agents.
-Version: 1.0.1
-Author: UCPHub
+Plugin Name: UCPhub for WooCommerce
+Description: UCPhub for WooCommerce is a plugin that allows you to utilize UCP to allow for customers to purchase your products using automated AI agents.
+Version: 1.0.3
+Author: UCPhub
 Author URI: https://ucphub.ai
 Text Domain: ucphub-for-woocommerce
 Domain Path: /languages
 Requires Plugins: woocommerce
+WC requires at least: 5.0
+WC tested up to: 10.6.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
@@ -22,7 +24,7 @@ function ucphub_check_woocommerce_installed()
     // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
     if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
         add_action('admin_notices', function () {
-            echo '<div class="error"><p>' . esc_html__('WooCommerce is not installed or activated. Please install and activate WooCommerce to use UCPHub.', 'ucphub-for-woocommerce') . '</p></div>';
+            echo '<div class="error"><p>' . esc_html__('WooCommerce is not installed or activated. Please install and activate WooCommerce to use UCPhub.', 'ucphub-for-woocommerce') . '</p></div>';
         });
         return false;
     }
@@ -33,7 +35,7 @@ if (!ucphub_check_woocommerce_installed()) {
     return;
 }
 
-define('UCPHUB_VERSION', '1.0.1');
+define('UCPHUB_VERSION', '1.0.3');
 define('UCPHUB_FILE', __FILE__);
 define('UCPHUB_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('UCPHUB_PLUGIN_URL', plugin_dir_url(__FILE__));

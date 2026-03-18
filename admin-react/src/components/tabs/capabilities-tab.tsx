@@ -23,10 +23,10 @@ export default function CapabilitiesTab() {
   const selectedCapabilities = localCapabilities ?? serverCapabilities;
 
   useEffect(() => {
-    if (settings?.connection_status === "connected" && !capabilitiesData) {
+    if (settings?.api_key && settings?.store_id && !capabilitiesData) {
       refetch();
     }
-  }, [settings?.connection_status, capabilitiesData, refetch]);
+  }, [settings?.api_key, settings?.store_id, capabilitiesData, refetch]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +59,7 @@ export default function CapabilitiesTab() {
     );
   };
 
-  if (settings?.connection_status !== "connected") {
+  if (!settings?.api_key || !settings?.store_id) {
     return (
       <Card>
         <CardContent>

@@ -35,7 +35,7 @@ class UCPHubDiscoveryCapability
         if (empty($api_key)) {
             return \UCPHub\UCPHubErrorHelper::create_error(
                 'not_configured',
-                __('UCPHub is not connected. Please configure the plugin in WordPress admin.', 'ucphub-for-woocommerce')
+                __('UCPhub is not connected. Please configure the plugin in WordPress admin.', 'ucphub-for-woocommerce')
             );
         }
 

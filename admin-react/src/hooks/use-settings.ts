@@ -20,7 +20,7 @@ export function useConnectStore() {
 
   return useMutation({
     mutationFn: async (data: {
-      action: "connect" | "disconnect";
+      action: "connect" | "disconnect" | "reset";
       api_key?: string;
       store_id?: string;
     }) => {
@@ -31,6 +31,8 @@ export function useConnectStore() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["settings"] });
+      queryClient.invalidateQueries({ queryKey: ["store"] });
+      queryClient.invalidateQueries({ queryKey: ["organization"] });
     },
   });
 }

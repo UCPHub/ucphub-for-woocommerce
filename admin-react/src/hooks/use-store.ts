@@ -17,12 +17,11 @@ export type UpdateStoreData = UpdateStoreDto;
 
 export function useStore() {
   const { data: settings } = useSettings();
-  const isConnected = settings?.connection_status === "connected";
 
   return useQuery<Store>({
     queryKey: ["store"],
     queryFn: () => api.request<Store>("store"),
-    enabled: isConnected,
+    enabled: Boolean(settings?.api_key && settings?.store_id),
   });
 }
 
@@ -54,22 +53,20 @@ export interface StoreCapabilities {
 
 export function useStoreCapabilities() {
   const { data: settings } = useSettings();
-  const isConnected = settings?.connection_status === "connected";
 
   return useQuery<StoreCapabilities>({
     queryKey: ["store", "capabilities"],
     queryFn: () => api.request<StoreCapabilities>("store/capabilities"),
-    enabled: isConnected,
+    enabled: Boolean(settings?.api_key && settings?.store_id),
   });
 }
 
 export function useStoreProfile() {
   const { data: settings } = useSettings();
-  const isConnected = settings?.connection_status === "connected";
 
   return useQuery({
     queryKey: ["store", "profile"],
     queryFn: () => api.request("store/profile"),
-    enabled: isConnected,
+    enabled: Boolean(settings?.api_key && settings?.store_id),
   });
 }

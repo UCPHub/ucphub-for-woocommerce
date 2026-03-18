@@ -80,7 +80,7 @@ export default function CredentialsStep({ onSuccess }: CredentialsStepProps) {
   return (
     <div className="space-y-6">
       <p className="text-muted-foreground">
-        First, create your store at the UCP Hub dashboard and copy your
+        First, create your store at the UCPhub dashboard and copy your
         credentials below.
       </p>
 

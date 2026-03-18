@@ -30,10 +30,10 @@ export default function PaymentsTab() {
   const enabledGateways = localEdits ?? serverEnabledGateways;
 
   useEffect(() => {
-    if (settings?.connection_status === "connected" && !store) {
+    if (settings?.api_key && settings?.store_id && !store) {
       refetchStore();
     }
-  }, [settings?.connection_status, store, refetchStore]);
+  }, [settings?.api_key, settings?.store_id, store, refetchStore]);
 
   const handleToggleGateway = (gatewayId: string, enabled: boolean) => {
     const current = enabledGateways;
@@ -66,7 +66,7 @@ export default function PaymentsTab() {
     }
   };
 
-  if (settings?.connection_status !== "connected") {
+  if (!settings?.api_key || !settings?.store_id) {
     return (
       <Card>
         <CardContent>

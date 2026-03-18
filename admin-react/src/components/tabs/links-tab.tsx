@@ -82,7 +82,7 @@ export default function LinksTab() {
     }
   }, [updateLinks, toast, refetchLinks]);
 
-  if (settings?.connection_status !== "connected") {
+  if (!settings?.api_key || !settings?.store_id) {
     return (
       <Card>
         <CardContent>

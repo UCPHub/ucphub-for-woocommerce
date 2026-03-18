@@ -48,7 +48,7 @@ export default function ToolsTab() {
         <CardContent className="space-y-4">
           <h3 className="text-lg font-semibold">Test Connection</h3>
           <p className="text-sm text-muted-foreground">
-            Test connectivity between your store and UCP Hub application.
+            Test connectivity between your store and UCPhub application.
           </p>
           <Button
             variant="outline"

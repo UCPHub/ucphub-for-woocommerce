@@ -171,6 +171,7 @@ class UCPHubAdminAPI
                 'permission_callback' => [$this, 'check_permission'],
             ]
         );
+
     }
 
     /**
@@ -222,9 +223,37 @@ class UCPHubAdminAPI
 
             UCPHubConfig::update('api_key', $api_key);
             UCPHubConfig::update('store_id', $store_id);
-            UCPHubConfig::update('connection_status', 'connected');
 
-    
+            $ucp_api = new UCPHubUCPAPI();
+            $validation = $ucp_api->make_request('/api/store-integrations/store-info', [
+                'method'  => 'GET',
+                'timeout' => 10,
+            ]);
+
+            if (is_wp_error($validation)) {
+                UCPHubConfig::delete('api_key');
+                UCPHubConfig::delete('store_id');
+                UCPHubConfig::delete('connection_status');
+                return new \WP_Error(
+                    'validation_failed',
+                    sprintf(__('Failed to validate credentials: %s', 'ucphub-for-woocommerce'), $validation->get_error_message()),
+                    ['status' => 500]
+                );
+            }
+
+            if ($validation['code'] !== 200 && $validation['code'] !== 201) {
+                UCPHubConfig::delete('api_key');
+                UCPHubConfig::delete('store_id');
+                UCPHubConfig::delete('connection_status');
+                $error_body = json_decode($validation['body'], true);
+                return new \WP_Error(
+                    'invalid_credentials',
+                    $error_body['message'] ?? sprintf(__('Invalid credentials (HTTP %d)', 'ucphub-for-woocommerce'), $validation['code']),
+                    ['status' => $validation['code']]
+                );
+            }
+
+            UCPHubConfig::update('connection_status', 'connected');
 
             return new \WP_REST_Response(
                 [
@@ -235,7 +264,9 @@ class UCPHubAdminAPI
                 ],
                 200
             );
-        } elseif ($action === 'disconnect') {
+        }
+
+        if ($action === 'disconnect') {
             $api_key = UCPHubConfig::get('api_key');
             $store_id = UCPHubConfig::get('store_id');
 
@@ -278,9 +309,22 @@ class UCPHubAdminAPI
             );
         }
 
+        if ($action === 'reset') {
+            UCPHubConfig::delete_all();
+
+            return new \WP_REST_Response(
+                [
+                    'success'            => true,
+                    'message'            => __('Credentials cleared', 'ucphub-for-woocommerce'),
+                    'connection_status'   => 'disconnected',
+                ],
+                200
+            );
+        }
+
         return new \WP_Error(
             'invalid_action',
-            __('Invalid action. Use "connect" or "disconnect"', 'ucphub-for-woocommerce'),
+            __('Invalid action. Use "connect", "disconnect", or "reset"', 'ucphub-for-woocommerce'),
             ['status' => 400]
         );
     }
@@ -801,7 +845,7 @@ class UCPHubAdminAPI
 
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log, WordPress.PHP.DevelopmentFunctions.error_log_print_r
-                error_log('UCPHub Store Update Error: ' . print_r([
+                error_log('UCPhub Store Update Error: ' . print_r([
                     'code' => $response['code'],
                     'body' => $response['body'],
                     'update_data' => $update_data,
@@ -1018,7 +1062,7 @@ class UCPHubAdminAPI
 
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log, WordPress.PHP.DevelopmentFunctions.error_log_print_r
-                error_log('UCPHub Integration Update Error: ' . print_r([
+                error_log('UCPhub Integration Update Error: ' . print_r([
                     'code' => $response['code'],
                     'body' => $response['body'],
                     'settings' => $merged_settings,

@@ -5,10 +5,11 @@ import { Descriptions, DescriptionsItem } from "@repo/react-ui/components/ui/des
 import { Separator } from "@repo/react-ui/components/ui/separator";
 import { Spinner } from "@repo/react-ui/components/ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
-import { CheckCircle, Unplug } from "lucide-react";
+import { AlertTriangle, CheckCircle, RefreshCw, Unplug } from "lucide-react";
 import { useEffect } from "react";
 
 import { toastMessage } from "../../hooks/toast-message";
+import { useCompleteSetup } from "../../hooks/use-connection-store";
 import { useOrganization } from "../../hooks/use-organization";
 import { useConnectStore, useSettings } from "../../hooks/use-settings";
 import { useStore } from "../../hooks/use-store";
@@ -17,22 +18,25 @@ import OnboardingFlow from "../onboarding/onboarding-flow";
 
 export default function GeneralTab() {
   const { data: settings, isLoading } = useSettings();
-  const { data: store, isLoading: storeLoading, refetch: refetchStore } = useStore();
+  const { data: store, isLoading: storeLoading, isError: storeError, refetch: refetchStore } = useStore();
   const { data: organization, isLoading: orgLoading, refetch: refetchOrg } = useOrganization();
   const connectStore = useConnectStore();
+  const completeSetup = useCompleteSetup();
   const queryClient = useQueryClient();
   const toast = toastMessage();
 
-  const isConnected = settings?.connection_status === "connected";
+  const hasCredentials = Boolean(settings?.api_key && settings?.store_id);
+  const isIntegrationDisconnected = hasCredentials && !storeLoading && !storeError && store?.integrationStatus === "disconnected";
+  const isDisconnected = hasCredentials && !storeLoading && (storeError || store?.integrationStatus !== "connected");
 
   useEffect(() => {
-    if (isConnected) {
+    if (hasCredentials) {
       if (!store)
         refetchStore();
       if (!organization)
         refetchOrg();
     }
-  }, [isConnected, store, organization, refetchStore, refetchOrg]);
+  }, [hasCredentials, store, organization, refetchStore, refetchOrg]);
 
   const handleOnboardingComplete = async (apiKey: string, storeId: string) => {
     try {
@@ -77,7 +81,9 @@ export default function GeneralTab() {
     );
   }
 
-  if (!isConnected) {
+  const onboardingComplete = hasCredentials && settings?.connection_status === "connected";
+
+  if (!onboardingComplete) {
     return <OnboardingFlow onComplete={handleOnboardingComplete} />;
   }
 
@@ -97,12 +103,46 @@ export default function GeneralTab() {
             : (
                 <Descriptions bordered>
                   <DescriptionsItem label="Status">
-                    <Badge className="bg-green-600 text-white capitalize">
-                      <CheckCircle className="size-3 mr-1" />
-                      {settings?.connection_status ?? "connected"}
-                    </Badge>
+                    {isDisconnected
+                      ? (
+                          <div className="flex items-center gap-2">
+                            <Badge variant="destructive" className="capitalize">
+                              <AlertTriangle className="size-3 mr-1" />
+                              disconnected
+                            </Badge>
+                            {isIntegrationDisconnected && (
+                              <ActionButton
+                                variant="outline"
+                                size="sm"
+                                successMessage="Store reconnected successfully"
+                                action={async () => {
+                                  try {
+                                    await completeSetup.mutateAsync({});
+                                    await queryClient.invalidateQueries({ queryKey: ["store"] });
+                                    return { error: false };
+                                  }
+                                  catch (err) {
+                                    return {
+                                      error: true,
+                                      message: err instanceof Error ? err.message : "Failed to reconnect",
+                                    };
+                                  }
+                                }}
+                              >
+                                <RefreshCw className="size-3" />
+                                Reconnect
+                              </ActionButton>
+                            )}
+                          </div>
+                        )
+                      : (
+                          <Badge className="bg-green-600 text-white capitalize">
+                            <CheckCircle className="size-3 mr-1" />
+                            connected
+                          </Badge>
+                        )}
                   </DescriptionsItem>
-                  <DescriptionsItem label="UCP Hub Dashboard">
+                  <DescriptionsItem label="UCPhub Dashboard">
                     <a
                       href="https://app.ucphub.ai/login"
                       target="_blank"
@@ -132,29 +172,33 @@ export default function GeneralTab() {
         </CardContent>
       </Card>
 
-      <Separator />
+      {!isDisconnected && (
+        <>
+          <Separator />
 
-      <Card className="border-destructive/50">
-        <CardContent className="space-y-4">
-          <h3 className="text-lg font-semibold text-destructive">Danger Zone</h3>
-          <p className="text-sm text-muted-foreground">
-            Disconnecting your store will prevent AI agents from interacting with it. You can reconnect at any time.
-          </p>
-          <ActionButton
-            variant="outline"
-            className="text-destructive border-destructive hover:text-destructive hover:bg-destructive/10"
-            requireAreYouSure
-            areYouSureDescription="This will disconnect your store from the UCP backend. AI agents will no longer be able to interact with your store. You can reconnect at any time."
-            areYouSureConfirmVariant="outline"
-            areYouSureConfirmClassName="text-destructive border-destructive hover:text-destructive hover:bg-destructive/10"
-            successMessage="Store disconnected successfully"
-            action={disconnectStore}
-          >
-            <Unplug className="size-4" />
-            Disconnect
-          </ActionButton>
-        </CardContent>
-      </Card>
+          <Card className="border-destructive/50">
+            <CardContent className="space-y-4">
+              <h3 className="text-lg font-semibold text-destructive">Danger Zone</h3>
+              <p className="text-sm text-muted-foreground">
+                Disconnecting your store will prevent AI agents from interacting with it. You can reconnect at any time.
+              </p>
+              <ActionButton
+                variant="outline"
+                className="text-destructive border-destructive hover:text-destructive hover:bg-destructive/10"
+                requireAreYouSure
+                areYouSureDescription="This will disconnect your store from the UCP backend. AI agents will no longer be able to interact with your store. You can reconnect at any time."
+                areYouSureConfirmVariant="outline"
+                areYouSureConfirmClassName="text-destructive border-destructive hover:text-destructive hover:bg-destructive/10"
+                successMessage="Store disconnected successfully"
+                action={disconnectStore}
+              >
+                <Unplug className="size-4" />
+                Disconnect
+              </ActionButton>
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   );
 }

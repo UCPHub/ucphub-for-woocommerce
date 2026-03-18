@@ -41,7 +41,7 @@ interface StoreResponse {
 
 export function useStoreLinks() {
   const { data: settings } = useSettings();
-  const isConnected = settings?.connection_status === "connected";
+  const hasCredentials = Boolean(settings?.api_key && settings?.store_id);
 
   return useQuery<StoreLink[]>({
     queryKey: ["store", "links"],
@@ -49,7 +49,7 @@ export function useStoreLinks() {
       const store = await api.request<StoreResponse>("store");
       return store.ucpLinks ?? [];
     },
-    enabled: isConnected,
+    enabled: hasCredentials,
   });
 }
 
